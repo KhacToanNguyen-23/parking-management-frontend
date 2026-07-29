@@ -788,9 +788,11 @@ export default function AdminDashboard({ onLogout }) {
   };
   const handleDeletePass = async (id, plate) => {
     if (!window.confirm(`Xóa vé định kỳ ${plate}?`)) return;
-    await staffApi.deleteParkingPass(id);
+    // Backend soft-delete vé đang ACTIVE (chuyển CANCELLED) và trả message tương ứng
+    // ("Đã hủy..." thay vì "Đã xóa...") → dùng message thật để UI không gây hiểu nhầm.
+    const res = await staffApi.deleteParkingPass(id);
     await reloadPasses();
-    showToast(`Đã xóa vé định kỳ ${plate}`, "warning");
+    showToast(res.data?.message || `Đã xóa vé định kỳ ${plate}`, "warning");
   };
 
   // Calculate dynamic stats from real backend data.
