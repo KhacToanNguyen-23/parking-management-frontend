@@ -153,12 +153,8 @@ export default function StaffCheckOut() {
   const [ticketMessage, setTicketMessage] = useState("Đang chờ quét vé...");
   const ticketScannerRef = useRef(null);
 
-  const fallbackExitGates = [
-    { id: "e0f0e151-627e-47a8-9660-f6b6ab4c7c2d", gateCode: "MAIN-OUT", gateName: "Cổng chính - Lối ra", gateType: "MAIN_EXIT" }
-  ];
-
-  const [exitGates, setExitGates] = useState(fallbackExitGates);
-  const [selectedGateId, setSelectedGateId] = useState(fallbackExitGates[0].id);
+  const [exitGates, setExitGates] = useState([]);
+  const [selectedGateId, setSelectedGateId] = useState("");
   const [vehicleTypes, setVehicleTypes] = useState([]);
   const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState("");
 
@@ -209,7 +205,7 @@ export default function StaffCheckOut() {
             s.vehicleType || "Xe",
             `${feeStr} (${formatDuration(duration)})`,
             s.paymentMethod === "VIETQR"
-              ? "VietQR CK" 
+              ? "VietQR CK"
               : (s.paymentMethod === "NCB" ? "Ngân hàng NCB" : (s.paymentMethod === "ONLINE" || s.paymentMethod === "VNPAY" ? "VNPAY Online" : "Tiền mặt")),
             s
           ];
@@ -231,12 +227,12 @@ export default function StaffCheckOut() {
       try {
         if (faceVideoRef.current) faceVideoRef.current.srcObject = null;
         if (plateVideoRef.current) plateVideoRef.current.srcObject = null;
-      } catch (e) {}
+      } catch (e) { }
 
       try {
         if (sharedStreamRef.current) {
           sharedStreamRef.current.getTracks().forEach(track => {
-            try { track.stop(); } catch (e) {}
+            try { track.stop(); } catch (e) { }
           });
         }
       } catch (err) {
@@ -250,11 +246,11 @@ export default function StaffCheckOut() {
           if (scanner.isScanning) {
             scanner.stop()
               .then(() => {
-                try { scanner.clear(); } catch (e) {}
+                try { scanner.clear(); } catch (e) { }
               })
               .catch(err => console.warn("Lỗi stop scanner checkout on unmount:", err));
           } else {
-            try { scanner.clear(); } catch (e) {}
+            try { scanner.clear(); } catch (e) { }
           }
         }
       } catch (err) {
@@ -286,7 +282,7 @@ export default function StaffCheckOut() {
       if (faceVideoRef.current) faceVideoRef.current.srcObject = null;
       if (plateVideoRef.current) plateVideoRef.current.srcObject = null;
       sharedStream.getTracks().forEach(track => {
-        try { track.stop(); } catch (e) {}
+        try { track.stop(); } catch (e) { }
       });
       setSharedStream(null);
     }
@@ -499,7 +495,7 @@ export default function StaffCheckOut() {
       ticketScannerRef.current = scanner;
       await scanner.start(
         { facingMode: "environment" },
-        { fps: 20, qrbox: { width: 155, height: 155 } },
+        { fps: 13, qrbox: { width: 190, height: 190 } },
         async (decodedText) => {
           const now = Date.now();
           if (decodedText === lastScannedTicketRef.current.text && now - lastScannedTicketRef.current.time < 3000) {
@@ -616,7 +612,7 @@ export default function StaffCheckOut() {
       if (plateVideoRef.current) plateVideoRef.current.srcObject = null;
       if (sharedStream) {
         sharedStream.getTracks().forEach(track => {
-          try { track.stop(); } catch (e) {}
+          try { track.stop(); } catch (e) { }
         });
         setSharedStream(null);
       }
@@ -1453,6 +1449,8 @@ export default function StaffCheckOut() {
           setExitGates(exits);
           const firstActiveGate = exits.find(g => g.isActive) || exits[0];
           setSelectedGateId(firstActiveGate.id);
+        } else {
+          setApiError('Không tìm thấy cổng ra hợp lệ (MAIN_EXIT hoặc MAIN_BOTH) trong cấu hình bãi xe.');
         }
         // Tự động khởi động cả hai camera và đầu đọc QR sau 400ms trễ
         mountTimer = setTimeout(() => {
@@ -1461,8 +1459,9 @@ export default function StaffCheckOut() {
           startTicketScanner();
         }, 400);
       } catch (err) {
-        console.warn('Failed to load dynamic config, keeping fallback gates:', err);
-        // Fallback khởi động camera sau 400ms trễ
+        console.error('Failed to load dynamic config:', err);
+        setApiError('Không thể tải cấu hình bãi xe từ máy chủ backend. Vui lòng kiểm tra kết nối API.');
+        // Vẫn khởi động camera để giao diện sẵn sàng
         mountTimer = setTimeout(() => {
           startFaceScanner();
           startPlateScanner();
@@ -1630,10 +1629,10 @@ export default function StaffCheckOut() {
                       onClick={toggleBothCameras}
                       disabled={showSuccess || !!previewFaceUrl || !!previewUrl}
                       className={`flex-1 py-1.5 rounded text-[9px] font-black uppercase transition-all cursor-pointer ${(showSuccess || previewFaceUrl || previewUrl)
-                          ? 'bg-slate-350 text-slate-500 cursor-not-allowed opacity-50'
-                          : (isFaceScanning || isPlateScanning)
-                            ? 'bg-rose-600 text-white'
-                            : 'bg-indigo-600 text-white'
+                        ? 'bg-slate-350 text-slate-500 cursor-not-allowed opacity-50'
+                        : (isFaceScanning || isPlateScanning)
+                          ? 'bg-rose-600 text-white'
+                          : 'bg-indigo-600 text-white'
                         }`}
                     >
                       {(isFaceScanning || isPlateScanning) ? 'Tắt Cam' : 'Bật Cam'}
@@ -1650,8 +1649,8 @@ export default function StaffCheckOut() {
                   <div className="flex flex-col items-center justify-center gap-1.5 mt-0.5">
 
                     <label className={`inline-flex items-center gap-1.5 px-3 py-1 rounded border transition-all text-[8px] font-black uppercase shadow-sm ${showSuccess
-                        ? "bg-slate-100 text-slate-455 border-slate-200 cursor-not-allowed pointer-events-none"
-                        : "cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-650 border border-indigo-200 active:scale-[0.98]"
+                      ? "bg-slate-100 text-slate-455 border-slate-200 cursor-not-allowed pointer-events-none"
+                      : "cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-650 border border-indigo-200 active:scale-[0.98]"
                       }`}>
                       <svg className={`w-3.5 h-3.5 ${showSuccess ? 'text-slate-455' : 'text-indigo-650'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -1912,12 +1911,17 @@ export default function StaffCheckOut() {
                 value={selectedGateId}
                 onChange={(e) => setSelectedGateId(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-indigo-500 bg-white cursor-pointer shadow-sm font-sans"
+                disabled={exitGates.length === 0}
               >
-                {exitGates.map(g => (
-                  <option key={g.id} value={g.id} disabled={!g.isActive}>
-                    {g.gateName}{g.isActive ? "" : " (BẢO TRÌ)"}
-                  </option>
-                ))}
+                {exitGates.length === 0 ? (
+                  <option value="">-- Chưa tải được cấu hình cổng --</option>
+                ) : (
+                  exitGates.map(g => (
+                    <option key={g.id} value={g.id} disabled={!g.isActive}>
+                      {g.gateName}{g.isActive ? "" : " (BẢO TRÌ)"}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
@@ -2100,7 +2104,7 @@ export default function StaffCheckOut() {
           <div className="flex gap-2 w-full">
             <button
               onClick={handleCheckOut}
-              disabled={isSubmitting || !sessionData}
+              disabled={isSubmitting || !sessionData || !selectedGateId}
               className="flex-1 rounded-xl bg-slate-900 py-3 text-xs font-bold text-white shadow-md hover:bg-slate-800 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:not-allowed flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
