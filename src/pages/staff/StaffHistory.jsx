@@ -4,8 +4,8 @@ import { formatLicensePlate, normalizeLicensePlate } from "../../utils/licensePl
 
 const LicensePlate = ({ plate, vehicleType }) => {
   const formatted = formatLicensePlate(plate, vehicleType);
-  const isBicycle = 
-    String(vehicleType || "").toUpperCase().includes("BICYCLE") || 
+  const isBicycle =
+    String(vehicleType || "").toUpperCase().includes("BICYCLE") ||
     String(plate || "").toUpperCase().startsWith("BC");
 
   if (isBicycle) {
@@ -138,7 +138,7 @@ export default function StaffHistory() {
         status: item.status === "ACTIVE" ? "parked" : "checked_out",
         paymentMethod: item.status === "ACTIVE" ? "--" : (
           item.paymentMethod === "VIETQR"
-            ? "VietQR CK" 
+            ? "VietQR CK"
             : (item.paymentMethod === "NCB" ? "Ngân hàng NCB" : (item.paymentMethod === "ONLINE" || item.paymentMethod === "VNPAY" ? "VNPAY Online" : "Tiền mặt"))
         ),
         driverType: item.driverType,
@@ -516,8 +516,8 @@ export default function StaffHistory() {
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${row.status === "checked_out"
-                          ? "bg-slate-100 text-slate-755 border-slate-200"
-                          : "bg-emerald-50 text-emerald-700 border-emerald-100 "
+                        ? "bg-slate-100 text-slate-755 border-slate-200"
+                        : "bg-emerald-50 text-emerald-700 border-emerald-100 "
                         }`}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${row.status === "checked_out" ? "bg-slate-500" : "bg-emerald-500"}`} />

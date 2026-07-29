@@ -570,7 +570,7 @@ export default function StaffCheckIn() {
         qrScannerRef.current = scanner;
         await scanner.start(
           { facingMode: "environment" },
-          { fps: 20, qrbox: { width: 140, height: 140 } },
+          { fps: 13, qrbox: { width: 155, height: 155 } },
           async (decodedText) => {
             const now = Date.now();
             if (decodedText === lastScannedTicketRef.current.text && now - lastScannedTicketRef.current.time < 3000) {
