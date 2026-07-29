@@ -6,7 +6,7 @@ export default function AdminGates({ gates, zones, handleOpenAddGate, handleOpen
       <div className="flex justify-between items-center text-left">
         <div>
           <h3 className="font-extrabold text-slate-900 text-base">Cổng kiểm soát & Làn Barrier</h3>
-          <p className="text-xs text-slate-400">Giám sát các camera IP nhận diện AI & thiết bị ngoại vi làn vào/ra.</p>
+          <p className="text-xs text-slate-400">Quản lý các làn vào/ra và điều khiển barrier cưỡng chế.</p>
         </div>
         <button onClick={handleOpenAddGate} className="rounded-xl bg-purple-600 hover:bg-purple-500 px-4 py-2.5 text-xs font-bold text-white cursor-pointer transition-colors shadow-lg shadow-purple-500/10">
           Thêm làn mới
@@ -29,7 +29,6 @@ export default function AdminGates({ gates, zones, handleOpenAddGate, handleOpen
                 <span className={`h-2 w-2 rounded-full ${g.status === "active" ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
               </div>
               <h4 className={`font-extrabold text-sm ${g.status === "active" ? "text-slate-900" : "text-slate-500 line-through"}`}>{g.name}</h4>
-              <p className="text-[10px] text-slate-450 font-mono">Địa chỉ IP Camera: {g.cameraIp}</p>
               {g.zoneId && (() => { const z = zones.find(z => z.id === g.zoneId); return z ? <p className="text-[10px] text-blue-600 font-bold"> Zone: {z.name} ({z.floorName})</p> : null; })()}
             </div>
 

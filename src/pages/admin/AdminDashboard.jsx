@@ -167,7 +167,7 @@ export default function AdminDashboard({ onLogout }) {
   const [isEditingZone, setIsEditingZone] = useState(false);
 
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
-  const [gateForm, setGateForm] = useState({ id: "", name: "", type: "MAIN_ENTRY", status: "active", barrier: "CLOSED", cameraIp: "", buildingId: "", zoneId: "" });
+  const [gateForm, setGateForm] = useState({ id: "", name: "", type: "MAIN_ENTRY", status: "active", barrier: "CLOSED", buildingId: "", zoneId: "" });
   const [isEditingGate, setIsEditingGate] = useState(false);
 
   const [isTariffModalOpen, setIsTariffModalOpen] = useState(false);
@@ -423,13 +423,12 @@ export default function AdminDashboard({ onLogout }) {
         occupied: z.currentCount || 0
       };
     }));
-    setGates((config.gates || []).map((g, idx) => ({
+    setGates((config.gates || []).map((g) => ({
       id: g.id,
       name: g.gateName || `Cổng ${g.gateCode}`,
       type: g.gateType || "MAIN_ENTRY",
       status: g.isActive === false ? "inactive" : "active",
       barrier: g.barrierState || "CLOSED",
-      cameraIp: `192.168.1.${50 + idx}`,
       buildingId: g.buildingId,
       zoneId: g.zoneId || ""
     })));
@@ -548,7 +547,7 @@ export default function AdminDashboard({ onLogout }) {
   };
 
   const handleOpenAddGate = () => {
-    setGateForm({ id: "", name: "", type: "MAIN_ENTRY", status: "active", barrier: "CLOSED", cameraIp: "", buildingId: firstBuildingId(), zoneId: "" });
+    setGateForm({ id: "", name: "", type: "MAIN_ENTRY", status: "active", barrier: "CLOSED", buildingId: firstBuildingId(), zoneId: "" });
     setIsEditingGate(false);
     setIsGateModalOpen(true);
   };
@@ -1328,10 +1327,6 @@ export default function AdminDashboard({ onLogout }) {
                   <option value="ZONE_EXIT">Cổng Zone — Ra</option>
                   <option value="ZONE_BOTH">Cổng Zone — Hai chiều</option>
                 </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase">Camera IP Address</label>
-                <input type="text" required value={gateForm.cameraIp} onChange={e => setGateForm({ ...gateForm, cameraIp: e.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-bold text-slate-800 focus:outline-none" />
               </div>
               {gateForm.type.startsWith("ZONE_") && (
                 <div className="space-y-1">

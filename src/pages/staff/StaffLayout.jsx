@@ -88,9 +88,14 @@ export default function StaffLayout({ onLogout }) {
   const [liveDate, setLiveDate] = useState("");
 
   // Lấy thông tin tài khoản đăng nhập từ localStorage
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const fullName = user.fullName || "Nguyễn Văn A";
-  const userRole = user.role || "STAFF";
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch (e) {
+    console.error("Failed to parse user from localStorage in StaffLayout:", e);
+  }
+  const fullName = user?.fullName || "Nguyễn Văn A";
+  const userRole = user?.role || "STAFF";
   const roleLabel = userRole === "STAFF" ? "Nhân viên bãi xe" : (userRole === "ADMIN" ? "Quản trị viên" : (userRole === "MANAGER" ? "Quản lý" : "Tài xế"));
   const avatarChar = fullName.charAt(0).toUpperCase();
 
@@ -156,7 +161,7 @@ export default function StaffLayout({ onLogout }) {
 
     const selectedVt = vehicleTypes.find(vt => vt.id === exceptionData.vehicleType);
     const isBicycle = selectedVt && (
-      selectedVt.name.toUpperCase().includes("XE ĐẠP") || 
+      selectedVt.name.toUpperCase().includes("XE ĐẠP") ||
       selectedVt.name.toUpperCase().includes("BICYCLE")
     );
     const isPlateRequired = exceptionData.vehicleType !== "NONE" && !isBicycle;
@@ -303,7 +308,7 @@ export default function StaffLayout({ onLogout }) {
 
   const selectedVtForRender = vehicleTypes.find(vt => vt.id === exceptionData.vehicleType);
   const isBicycleForRender = selectedVtForRender && (
-    selectedVtForRender.name.toUpperCase().includes("XE ĐẠP") || 
+    selectedVtForRender.name.toUpperCase().includes("XE ĐẠP") ||
     selectedVtForRender.name.toUpperCase().includes("BICYCLE")
   );
   const isPlateRequiredForRender = exceptionData.vehicleType !== "NONE" && !isBicycleForRender;
@@ -446,14 +451,6 @@ export default function StaffLayout({ onLogout }) {
                 </svg>
 
               </button>
-
-              <button className="relative rounded-xl p-2.5 text-indigo-700 hover:text-indigo-900 hover:bg-indigo-200/60 transition-all cursor-pointer">
-                <IconBell />
-                <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
-              </button>
-              <button className="rounded-xl p-2.5 text-indigo-700 hover:text-indigo-900 hover:bg-indigo-200/60 transition-all cursor-pointer">
-                <IconSettings />
-              </button>
             </div>
 
             <div className="flex items-center gap-3.5 border-l border-indigo-200 pl-6">
@@ -580,7 +577,7 @@ export default function StaffLayout({ onLogout }) {
         )}
 
         {/* Toast Message Notification */}
-        {apiMessage && (
+         {apiMessage && (
           <div className="fixed top-16 right-30 z-[100] animate-in slide-in-from-top-5">
             <div className={`px-4 py-3 rounded-xl shadow-lg border text-sm font-bold flex items-center gap-3 ${apiMessage.includes("✅")
               ? "bg-emerald-50 border-emerald-200 text-emerald-800"
