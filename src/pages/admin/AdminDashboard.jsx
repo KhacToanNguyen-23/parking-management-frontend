@@ -787,12 +787,20 @@ export default function AdminDashboard({ onLogout }) {
     }
   };
   const handleDeletePass = async (id, plate) => {
-    if (!window.confirm(`Xóa vé định kỳ ${plate}?`)) return;
-    // Backend soft-delete vé đang ACTIVE (chuyển CANCELLED) và trả message tương ứng
-    // ("Đã hủy..." thay vì "Đã xóa...") → dùng message thật để UI không gây hiểu nhầm.
+    if (!window.confirm(`Hủy vé định kỳ ${plate}?\nVé sẽ chuyển sang trạng thái "Đã hủy" (có thể kích hoạt lại sau), không bị xóa vĩnh viễn.`)) return;
+    // Backend luôn soft-cancel (chuyển CANCELLED), không xóa cứng. Dùng message thật từ backend.
     const res = await staffApi.deleteParkingPass(id);
     await reloadPasses();
-    showToast(res.data?.message || `Đã xóa vé định kỳ ${plate}`, "warning");
+    showToast(res.data?.message || `Đã hủy vé định kỳ ${plate}`, "warning");
+  };
+  const handleReactivatePass = async (id) => {
+    try {
+      const res = await staffApi.reactivateParkingPass(id);
+      await reloadPasses();
+      showToast(res.data?.message || "Đã kích hoạt lại vé định kỳ");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Kích hoạt lại thất bại", "warning");
+    }
   };
 
   // Calculate dynamic stats from real backend data.
@@ -1122,6 +1130,7 @@ export default function AdminDashboard({ onLogout }) {
               handleOpenEditPass={handleOpenEditPass}
               handleRenewPass={handleRenewPass}
               handleDeletePass={handleDeletePass}
+              handleReactivatePass={handleReactivatePass}
             />
           )}
 

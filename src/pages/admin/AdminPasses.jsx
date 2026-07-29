@@ -23,6 +23,7 @@ export default function AdminPasses({
   handleOpenEditPass,
   handleRenewPass,
   handleDeletePass,
+  handleReactivatePass,
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm shadow-slate-100/50 space-y-6">
@@ -74,14 +75,19 @@ export default function AdminPasses({
                 </td>
                 <td className="p-4">
                   <div className="flex justify-center gap-2">
-                    {/* Vé đã hủy (CANCELLED): ẩn Gia hạn (tránh hồi sinh nhầm) + ẩn Sửa, chỉ giữ Xóa để dọn hẳn */}
-                    {p.status !== "cancelled" && (
-                      <button onClick={() => handleRenewPass(p.id)} className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold border border-indigo-200 cursor-pointer transition-colors">Gia hạn {p.passType === "YEARLY" ? "1 năm" : p.passType === "QUARTERLY" ? "1 quý" : "1 tháng"}</button>
+                    {p.status === "cancelled" ? (
+                      // Vé đã hủy: chỉ còn 1 hành động — kích hoạt lại (không xóa cứng khỏi DB)
+                      <button onClick={() => handleReactivatePass(p.id)} className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 cursor-pointer transition-colors">Kích hoạt lại</button>
+                    ) : (
+                      <>
+                        <button onClick={() => handleRenewPass(p.id)} className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold border border-indigo-200 cursor-pointer transition-colors">Gia hạn {p.passType === "YEARLY" ? "1 năm" : p.passType === "QUARTERLY" ? "1 quý" : "1 tháng"}</button>
+                        {/* Vé ACTIVE (còn hạn) = hợp đồng đã chốt → KHÔNG cho Sửa. Chỉ vé chưa chốt mới cho sửa. */}
+                        {p.status !== "active" && (
+                          <button onClick={() => handleOpenEditPass(p)} className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 cursor-pointer transition-colors">Sửa</button>
+                        )}
+                        <button onClick={() => handleDeletePass(p.id, p.plate)} className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold border border-amber-200 cursor-pointer transition-colors">Hủy</button>
+                      </>
                     )}
-                    {p.status !== "cancelled" && (
-                      <button onClick={() => handleOpenEditPass(p)} className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 cursor-pointer transition-colors">Sửa</button>
-                    )}
-                    <button onClick={() => handleDeletePass(p.id, p.plate)} className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold border border-red-200 cursor-pointer transition-colors">Xóa</button>
                   </div>
                 </td>
               </tr>
