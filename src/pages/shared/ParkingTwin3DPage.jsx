@@ -33,7 +33,9 @@ export default function ParkingTwin3DPage() {
           id: g.id,
           gateCode: g.gateCode,
           gateName: g.gateName,
-          gateType: g.gateType,
+          type: g.gateType,
+          zoneId: g.zoneId || "",
+          barrier: g.barrierState || "CLOSED",
           status: g.isActive === false ? "INACTIVE" : "ACTIVE",
         }))
       );
