@@ -776,7 +776,7 @@ export default function ExceptionLogsPage({ showToast, user }) {
                       {log.licensePlate && (
                         <div className="flex items-center gap-1">
                           <span className="inline-flex items-center rounded-md border border-slate-300 bg-white px-2 py-0.5 font-mono text-[10px] font-black tracking-widest text-slate-900 shadow-sm">
-                            {log.licensePlate}
+                            {log.licensePlate !== "Chưa xác định" ? formatLicensePlate(log.licensePlate, log.vehicleType) : log.licensePlate}
                           </span>
                           {log.vehicleType && (
                             <span className="inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
@@ -788,14 +788,14 @@ export default function ExceptionLogsPage({ showToast, user }) {
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       {!isResolved && canResolve && (
-                        <button onClick={(e) => { e.stopPropagation(); openResolveModal(log); }} className="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1 rounded shadow-sm transition-colors">
+                        <button onClick={(e) => { e.stopPropagation(); openResolveModal(log); }} className="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1 rounded shadow-sm transition-colors whitespace-nowrap">
                           Giải quyết
                         </button>
                       )}
                       {!isResolved && (
-                        <button onClick={(e) => { e.stopPropagation(); handleEdit(log); }} className="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold px-2 py-1 rounded shadow-sm transition-colors">
+                        <button onClick={(e) => { e.stopPropagation(); handleEdit(log); }} className="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold px-2 py-1 rounded shadow-sm transition-colors whitespace-nowrap">
                           Sửa
                         </button>
                       )}
@@ -830,8 +830,8 @@ export default function ExceptionLogsPage({ showToast, user }) {
                   {(() => {
                     const evidenceImages = (log.imageUrls || []).filter(url => url && !url.startsWith('[RESOLVE]'));
                     const resolveImages = (log.resolutionImageUrls || []).length > 0
-                        ? log.resolutionImageUrls.map(url => url.replace('[RESOLVE]', ''))
-                        : (log.imageUrls || []).filter(url => url && url.startsWith('[RESOLVE]')).map(url => url.replace('[RESOLVE]', ''));
+                      ? log.resolutionImageUrls.map(url => url.replace('[RESOLVE]', ''))
+                      : (log.imageUrls || []).filter(url => url && url.startsWith('[RESOLVE]')).map(url => url.replace('[RESOLVE]', ''));
 
                     return (evidenceImages.length > 0 || resolveImages.length > 0) ? (
                       <div className="flex flex-wrap gap-6 mt-2">
@@ -891,11 +891,10 @@ export default function ExceptionLogsPage({ showToast, user }) {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? "border-red-600 bg-red-600 text-white shadow-sm"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                  }`}
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-sm font-medium transition-colors ${currentPage === page
+                    ? "border-red-600 bg-red-600 text-white shadow-sm"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
                 >
                   {page}
                 </button>
@@ -932,14 +931,28 @@ export default function ExceptionLogsPage({ showToast, user }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setViewingLogDetail(null)}>
           <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl border border-slate-200/80 p-6 space-y-5 transform transition-all scale-100" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-3">
-                <p className="font-semibold text-slate-900 text-lg">{viewingLogDetail.licensePlate || "—"}</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${viewingLogDetail.status === "RESOLVED" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                  {viewingLogDetail.status === "RESOLVED" ? "Đã giải quyết" : "Chưa giải quyết"}
-                </span>
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+              <div className="flex gap-4 items-start">
+                {/* Icon */}
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 border border-indigo-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                {/* Title & Badges */}
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-800 to-slate-800 leading-tight">Chi tiết sự cố an ninh</h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-0.5 font-mono text-[11px] font-bold tracking-widest text-slate-700 shadow-sm">
+                      {viewingLogDetail.licensePlate ? (viewingLogDetail.licensePlate !== "Chưa xác định" ? formatLicensePlate(viewingLogDetail.licensePlate, viewingLogDetail.vehicleType) : viewingLogDetail.licensePlate) : "—"}
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide border ${viewingLogDetail.status === "RESOLVED" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
+                      {viewingLogDetail.status === "RESOLVED" ? "✓ Đã giải quyết" : "⏳ Chưa giải quyết"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <button onClick={() => setViewingLogDetail(null)} className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+              <button onClick={() => setViewingLogDetail(null)} className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1.5 transition-colors cursor-pointer self-start -mt-1 -mr-1">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -1024,8 +1037,8 @@ export default function ExceptionLogsPage({ showToast, user }) {
               {(viewingLogDetail.imageUrls?.length > 0 || viewingLogDetail.resolutionImageUrls?.length > 0) && (() => {
                 const evidenceImages = (viewingLogDetail.imageUrls || []).filter(url => url && !url.startsWith('[RESOLVE]'));
                 const resolveImages = (viewingLogDetail.resolutionImageUrls || []).length > 0
-                    ? viewingLogDetail.resolutionImageUrls.map(url => url.replace('[RESOLVE]', ''))
-                    : (viewingLogDetail.imageUrls || []).filter(url => url && url.startsWith('[RESOLVE]')).map(url => url.replace('[RESOLVE]', ''));
+                  ? viewingLogDetail.resolutionImageUrls.map(url => url.replace('[RESOLVE]', ''))
+                  : (viewingLogDetail.imageUrls || []).filter(url => url && url.startsWith('[RESOLVE]')).map(url => url.replace('[RESOLVE]', ''));
 
                 if (evidenceImages.length === 0 && resolveImages.length === 0) return null;
 
@@ -1079,7 +1092,7 @@ export default function ExceptionLogsPage({ showToast, user }) {
               <button onClick={() => setViewingLogDetail(null)} className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-xl transition-all cursor-pointer">
                 Đóng
               </button>
-              {viewingLogDetail.status !== "RESOLVED" && (
+              {viewingLogDetail.status !== "RESOLVED" && canResolve && (
                 <button
                   onClick={() => { setViewingLogDetail(null); openResolveModal(viewingLogDetail); }}
                   className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded-xl transition-all shadow-md shadow-rose-100 cursor-pointer"
@@ -1126,7 +1139,7 @@ export default function ExceptionLogsPage({ showToast, user }) {
                   <span className="block text-xs font-bold uppercase text-slate-500 mb-2">Biển số xe</span>
                   <div className="flex items-stretch gap-2">
                     <span className="inline-flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-4 py-2 font-mono text-xl font-black tracking-widest text-slate-900 shadow-sm whitespace-nowrap">
-                      {resolvingLog.licensePlate}
+                      {resolvingLog.licensePlate !== "Chưa xác định" ? formatLicensePlate(resolvingLog.licensePlate, resolvingLog.vehicleType) : resolvingLog.licensePlate}
                     </span>
                     {resolvingLog.vehicleType && (
                       <span className="inline-flex items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 shadow-sm whitespace-nowrap">

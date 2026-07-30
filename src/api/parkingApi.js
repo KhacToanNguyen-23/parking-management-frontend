@@ -215,6 +215,10 @@ export const staffApi = {
     return axiosClient.post(`/admin/parking-passes/${id}/renew`);
   },
 
+  reactivateParkingPass(id) {
+    return axiosClient.post(`/admin/parking-passes/${id}/reactivate`);
+  },
+
   getAdminSettings() {
     return axiosClient.get("/admin/settings");
   },
