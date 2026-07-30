@@ -114,6 +114,7 @@ export default function AdminExceptionLogs({ showToast, user }) {
     try {
       await staffApi.resolveSecurityException(resolvingLog.id, {
         handledByUserId: user.id,
+        resolution: resolveNote.trim() || undefined,
         resolutionNote: resolveNote.trim() || undefined,
       });
       showToast("Đã giải quyết sự cố!", "success");

@@ -804,26 +804,18 @@ export default function ExceptionLogsPage({ showToast, user }) {
 
                   {/* Body */}
                   <div className="text-sm font-medium leading-relaxed text-slate-700 my-1">
-                    {(() => {
-                      const fullDesc = log.description || "—";
-                      const separatorRegex = /\s*===\s*GHI CHÚ GIẢI QUYẾT\s*===\s*/;
-                      if (separatorRegex.test(fullDesc)) {
-                        const [desc, res] = fullDesc.split(separatorRegex);
-                        return (
-                          <div className="flex flex-col gap-2.5">
-                            <p className="whitespace-pre-wrap">{desc.trim()}</p>
-                            <div className="rounded-xl border-l-2 border-emerald-400 bg-emerald-50/70 p-3 shadow-inner">
-                              <span className="block text-[9px] font-black uppercase tracking-wider text-emerald-600 mb-1 flex items-center gap-1">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                Ghi chú giải quyết
-                              </span>
-                              <p className="font-semibold text-emerald-900 text-xs whitespace-pre-wrap">{res.trim()}</p>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return <p className="whitespace-pre-wrap">{fullDesc.trim()}</p>;
-                    })()}
+                    <div className="flex flex-col gap-2.5">
+                      <p className="whitespace-pre-wrap">{log.description || "—"}</p>
+                      {log.resolution && (
+                        <div className="rounded-xl border-l-2 border-emerald-400 bg-emerald-50/70 p-3 shadow-inner">
+                          <span className="block text-[9px] font-black uppercase tracking-wider text-emerald-600 mb-1 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Ghi chú giải quyết
+                          </span>
+                          <p className="font-semibold text-emerald-900 text-xs whitespace-pre-wrap">{log.resolution}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Image Thumbnails */}
@@ -970,35 +962,9 @@ export default function ExceptionLogsPage({ showToast, user }) {
               {/* Mô tả */}
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-2">Mô tả</p>
-                <p className="whitespace-pre-wrap text-slate-700">
-                  {(() => {
-                    const fullDesc = viewingLogDetail.description || "Không có mô tả.";
-                    const separatorRegex = /\s*===\s*GHI CHÚ GIẢI QUYẾT\s*===\s*/;
-                    if (separatorRegex.test(fullDesc)) {
-                      return fullDesc.split(separatorRegex)[0].trim();
-                    }
-                    return fullDesc;
-                  })()}
-                </p>
+                <p className="whitespace-pre-wrap text-slate-700">{viewingLogDetail.description || "Không có mô tả."}</p>
               </div>
 
-              {/* === GHI CHÚ GIẢI QUYẾT === in description (backward compat) */}
-              {(() => {
-                const fullDesc = viewingLogDetail.description || "";
-                const separatorRegex = /\s*===\s*GHI CHÚ GIẢI QUYẾT\s*===\s*/;
-                if (separatorRegex.test(fullDesc)) {
-                  const resNote = fullDesc.split(separatorRegex)[1]?.trim();
-                  if (resNote) {
-                    return (
-                      <div className="text-sm font-medium text-emerald-950 whitespace-pre-wrap rounded-2xl bg-emerald-50 border border-emerald-200 p-4 leading-relaxed">
-                        <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 mb-2 font-bold">Ghi chú giải quyết</p>
-                        <p>{resNote}</p>
-                      </div>
-                    );
-                  }
-                }
-                return null;
-              })()}
 
               {/* Ảnh minh chứng sự cố */}
               {viewingLogDetail.imageUrls && viewingLogDetail.imageUrls.filter(url => url && !url.startsWith('[RESOLVE]')).length > 0 && (
@@ -1030,7 +996,9 @@ export default function ExceptionLogsPage({ showToast, user }) {
                 <>
                   <div className="pt-2 border-t border-slate-100">
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-2">Phương án giải quyết</p>
-                    <p className="font-semibold text-slate-800 whitespace-pre-wrap">{viewingLogDetail.resolution || "Không có chi tiết giải quyết."}</p>
+                    <p className="font-semibold text-slate-800 whitespace-pre-wrap">
+                      {viewingLogDetail.resolution || "Không có chi tiết giải quyết."}
+                    </p>
                   </div>
 
               {/* Images */}
