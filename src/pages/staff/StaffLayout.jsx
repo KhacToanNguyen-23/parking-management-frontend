@@ -175,7 +175,7 @@ export default function StaffLayout({ onLogout }) {
 
     // Validate biển số nếu có nhập biển số
     if (exceptionData.plate && exceptionData.plate.trim() !== "") {
-      const plateError = getLicensePlateValidationError(exceptionData.plate);
+      const plateError = getLicensePlateValidationError(exceptionData.plate, selectedVt?.name);
       if (plateError) {
         setApiMessage(`❌ Lỗi biển số: ${plateError}`);
         setTimeout(() => setApiMessage(""), 5000);
@@ -521,7 +521,7 @@ export default function StaffLayout({ onLogout }) {
                       className="w-full text-sm font-mono border border-slate-300 rounded-lg p-2.5 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                       placeholder="VD: 30A-123.45"
                       value={exceptionData.plate}
-                      onChange={(e) => setExceptionData({ ...exceptionData, plate: formatLicensePlate(e.target.value) })}
+                      onChange={(e) => setExceptionData({ ...exceptionData, plate: formatLicensePlate(e.target.value, selectedVtForRender?.name) })}
                     />
                   </div>
                   <div>
@@ -529,7 +529,18 @@ export default function StaffLayout({ onLogout }) {
                     <select
                       className="w-full text-sm border border-slate-300 rounded-lg p-2.5 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-slate-50"
                       value={exceptionData.vehicleType}
-                      onChange={(e) => setExceptionData({ ...exceptionData, vehicleType: e.target.value })}
+                      onChange={(e) => {
+                        const newVtId = e.target.value;
+                        const selectedVt = vehicleTypes.find(vt => vt.id === newVtId);
+                        const formattedPlate = exceptionData.plate
+                          ? formatLicensePlate(exceptionData.plate, selectedVt?.name)
+                          : "";
+                        setExceptionData({
+                          ...exceptionData,
+                          vehicleType: newVtId,
+                          plate: formattedPlate
+                        });
+                      }}
                     >
                       {vehicleTypes.map((vt) => (
                         <option key={vt.id} value={vt.id}>
